@@ -248,7 +248,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 .radios input{width:auto;margin-top:3px}
 .radios small{display:block;color:var(--muted);font-size:12px}
 .hsteps{list-style:none;margin:0;padding:0;display:flex;align-items:flex-start;min-width:0}
-.hsteps li{position:relative;flex:1;font-size:12px;color:var(--muted);padding:16px 6px 0 0;min-width:0;overflow-wrap:anywhere;line-height:1.3}
+.hsteps li{position:relative;flex:1;font-size:12px;color:var(--muted);padding:16px 6px 0 0;min-width:0;line-height:1.3}
 .hsteps li::before{content:"";position:absolute;top:0;left:0;width:10px;height:10px;border-radius:50%;background:var(--line);box-sizing:border-box}
 .hsteps li::after{content:"";position:absolute;top:4px;left:12px;right:2px;height:2px;background:var(--line)}
 .hsteps li:last-child::after{display:none}
@@ -360,8 +360,8 @@ const POLICIES = [
   {no:'XXX 0312 7781', kind:'КАСКО', ins:'Ингосстрах', c:'ДЛ-0455/25', from:'20.02.2025', to:'19.02.2026', st:'expired'},
 ];
 let REQUESTS = [
-  {id:'З-1042', kind:'Справка об отсутствии задолженности', c:'Все договоры', created:'06.10.2026', st:'done', steps:['Принят','Сформирован в 1С','Подписан','Готов к скачиванию']},
-  {id:'З-1051', kind:'Оригиналы УПД за сентябрь', c:'ДЛ-0412/24', created:'09.10.2026', st:'work', steps:['Принят','Передан в бухгалтерию','Отправка по ЭДО']},
+  {id:'З-1042', kind:'Справка об отсутствии задолженности', c:'Все договоры', created:'06.10.2026', st:'done', steps:['Принят','Сформирован','Подписан','Готов']},
+  {id:'З-1051', kind:'Оригиналы УПД за сентябрь', c:'ДЛ-0412/24', created:'09.10.2026', st:'work', steps:['Принят','В бухгалтерии','Отправка по ЭДО']},
 ];
 const STAFF = [
   {name:'Марат Сафин', mail:'m.safin@trans-volga.ru', role:'Владелец', note:'Полный доступ, управление сотрудниками'},
@@ -651,8 +651,8 @@ function invAll(cb){ icks().forEach(c=>c.checked=cb.checked); invCnt(); }
 function invCnt(){ const n=icks().filter(c=>c.checked).length; document.getElementById('bcnt').textContent=n?`Выбрано: ${n}`:'Ничего не выбрано'; }
 function invDl(){ const n=icks().filter(c=>c.checked).length; toast(n?`Архив из ${n} документов сохранён`:'Отметьте документы в списке'); }
 function invOrig(){ const n=icks().filter(c=>c.checked).length; if(!n) return toast('Отметьте документы в списке');
-  REQUESTS.unshift({id:'З-10'+(52+REQUESTS.length), kind:`Оригиналы ${n} УПД по ЭДО`, c:'Выбранные', created:'12.10.2026', st:'work', steps:['Принят','Передан в бухгалтерию']}); toast(`Запрос на оригиналы ${n} документов отправлен`); }
-function actGo(e){ e.preventDefault(); REQUESTS.unshift({id:'З-10'+(52+REQUESTS.length), kind:'Акт сверки за III квартал 2026', c:'Все договоры', created:'12.10.2026', st:'work', steps:['Принят','Формируется в 1С']}); toast('Акт сверки формируется, следите в разделе «Запросы»'); location.hash='#/requests'; }
+  REQUESTS.unshift({id:'З-10'+(52+REQUESTS.length), kind:`Оригиналы ${n} УПД по ЭДО`, c:'Выбранные', created:'12.10.2026', st:'work', steps:['Принят','В бухгалтерии']}); toast(`Запрос на оригиналы ${n} документов отправлен`); }
+function actGo(e){ e.preventDefault(); REQUESTS.unshift({id:'З-10'+(52+REQUESTS.length), kind:'Акт сверки за III квартал 2026', c:'Все договоры', created:'12.10.2026', st:'work', steps:['Принят','Формируется']}); toast('Акт сверки формируется, следите в разделе «Запросы»'); location.hash='#/requests'; }
 
 V.requests = (filter='all') => {
   const list = REQUESTS.filter(r=>filter==='all'||(filter==='work'?r.st!=='done':r.st==='done'));
@@ -664,7 +664,7 @@ V.requests = (filter='all') => {
   <div class="actions"><a class="btn primary" href="#/requests/new">Новый запрос</a></div></div>
 <div class="chips">${[['all','Все'],['work','В работе'],['done','Выполненные']].map(([k,v])=>`<button class="chip" aria-pressed="${k===filter}" onclick="render('requests','${k}')">${v}</button>`).join('')}</div>
 <div class="card"><ul class="clist">${list.map(r=>`<li><div class="row1"><b>${esc(r.kind)}</b>${status(r)}</div><span class="sub">${r.id} · ${esc(r.c)} · создан ${r.created}</span>${steps(r)}<div>${action(r)}</div></li>`).join('')||'<li class="empty">Запросов нет</li>'}</ul>
-<div class="scroll"><table class="tbl fixed"><colgroup><col style="width:30%"><col style="width:14%"><col style="width:12%"><col style="width:30%"><col style="width:14%"></colgroup>
+<div class="scroll"><table class="tbl fixed"><colgroup><col style="width:27%"><col style="width:13%"><col style="width:11%"><col style="width:36%"><col style="width:13%"></colgroup>
   <thead><tr><th>Запрос</th><th>Договор</th><th>Создан</th><th>Этап</th><th class="r"></th></tr></thead>
   <tbody>${list.map(r=>`<tr><td><b>${esc(r.kind)}</b><span class="sub">${r.id}</span></td><td>${esc(r.c)}</td><td class="num">${r.created}</td><td>${steps(r)}</td><td class="r">${status(r)}<div style="margin-top:6px">${action(r)}</div></td></tr>`).join('')||'<tr><td colspan="5" class="empty">Запросов нет</td></tr>'}</tbody>
 </table></div></div>`;
