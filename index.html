@@ -220,6 +220,9 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 .tabs button{border:0;background:none;padding:10px 14px;cursor:pointer;color:var(--muted);font-weight:500;border-bottom:2px solid transparent;white-space:nowrap}
 .tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--blue)}
 .dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:16px 24px}
+.dl dd{overflow-wrap:anywhere}
+.dl .w2{grid-column:span 2}
+.paidrow{display:flex;justify-content:space-between;gap:6px 16px;font-size:13px;flex-wrap:wrap}
 /* contract cards for phones; the table stays for desktop */
 .clist{display:none;list-style:none;margin:0;padding:0}
 .clist li{padding:14px 16px;border-top:1px solid var(--line);display:grid;gap:8px}
@@ -240,6 +243,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 .toolbar select,.toolbar input{width:auto}
 .bulk{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:12px 18px;background:var(--sky2);border-bottom:1px solid var(--line);font-size:14px}
 .bulk .btn{margin-left:0}
+.bulk #bcnt{min-width:9.5em;font-variant-numeric:tabular-nums}
 .empty{padding:36px 18px;text-align:center;color:var(--muted)}
 
 /* calendar */
@@ -270,7 +274,7 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);bo
 .radios input{width:auto;margin-top:3px}
 .radios small{display:block;color:var(--muted);font-size:12px}
 .hsteps{list-style:none;margin:0;padding:0;display:flex;align-items:flex-start;min-width:0}
-.hsteps li{position:relative;flex:1;font-size:12px;color:var(--muted);padding:16px 6px 0 0;min-width:0;line-height:1.3}
+.hsteps li{position:relative;flex:1;font-size:11px;color:var(--muted);padding:16px 6px 0 0;min-width:0;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .hsteps li::before{content:"";position:absolute;top:0;left:0;width:10px;height:10px;border-radius:50%;background:var(--line);box-sizing:border-box}
 .hsteps li::after{content:"";position:absolute;top:4px;left:12px;right:2px;height:2px;background:var(--line)}
 .hsteps li:last-child::after{display:none}
@@ -291,9 +295,13 @@ body:has(.app) .demo-tag{display:none}
 .tbl .nowrap{white-space:nowrap}
 .tbl.fixed{table-layout:fixed;min-width:760px}
 .tbl.fixed td{overflow-wrap:anywhere}
+.tbl.rows-eq td{height:86px}
 
 @media (max-width:980px){
   .statement,.grid2,.grid3,.cal{grid-template-columns:1fr}
+  .topbar{gap:16px}
+  .topbar .sync,.topbar .who .role{display:none}
+  .topbar .who{margin-left:auto}
   .login{grid-template-columns:1fr}
   .login-art{min-height:260px;padding:28px}
   .login-art .sphere{right:-30%;width:70%}
@@ -384,7 +392,7 @@ const POLICIES = [
 ];
 let REQUESTS = [
   {id:'З-1042', kind:'Справка об отсутствии задолженности', c:'Все договоры', created:'06.10.2026', st:'done', steps:['Принят','Сформирован','Подписан','Готов']},
-  {id:'З-1051', kind:'Оригиналы УПД за сентябрь', c:'ДЛ-0412/24', created:'09.10.2026', st:'work', steps:['Принят','В бухгалтерии','Отправка по ЭДО']},
+  {id:'З-1051', kind:'Оригиналы УПД за сентябрь', c:'ДЛ-0412/24', created:'09.10.2026', st:'work', steps:['Принят','В бухгалтерии','Отправка ЭДО']},
 ];
 const STAFF = [
   {name:'Марат Сафин', mail:'m.safin@trans-volga.ru', role:'Владелец', note:'Полный доступ, управление сотрудниками'},
@@ -586,7 +594,7 @@ V.contract = (id, tab='subject') => { const c=byId(id); if(!c) return V.contract
   const np=PAYMENTS.find(p=>p.c===c.id); const paidSum=c.advance+c.monthly*c.paid;
   const tabs={subject:'Предмет лизинга',schedule:'График платежей и начислений',docs:'Документы',policies:'Полисы'};
   let body='';
-  if(tab==='subject') body=`<div class="bd"><div class="dl"><div><dt>Предмет</dt><dd>${esc(c.subject)}</dd></div><div><dt>VIN</dt><dd class="num">${c.vin}</dd></div><div><dt>Гос. номер</dt><dd>${c.plate}</dd></div><div><dt>Год выпуска</dt><dd>${c.year}</dd></div><div><dt>Цвет</dt><dd>${c.color}</dd></div><div><dt>Регистрация в ГИБДД</dt><dd>Лизингополучатель</dd></div><div><dt>СТС</dt><dd>99 51 № 041233 от ${c.handed}</dd></div><div><dt>Балансодержатель</dt><dd>Лизингодатель</dd></div></div></div>`;
+  if(tab==='subject') body=`<div class="bd"><div class="dl"><div><dt>Предмет</dt><dd>${esc(c.subject)}</dd></div><div class="w2"><dt>VIN</dt><dd class="num">${c.vin}</dd></div><div><dt>Гос. номер</dt><dd>${c.plate}</dd></div><div><dt>Год выпуска</dt><dd>${c.year}</dd></div><div><dt>Цвет</dt><dd>${c.color}</dd></div><div><dt>Регистрация в ГИБДД</dt><dd>Лизингополучатель</dd></div><div><dt>СТС</dt><dd>99 51 № 041233 от ${c.handed}</dd></div><div><dt>Балансодержатель</dt><dd>Лизингодатель</dd></div></div></div>`;
   if(tab==='schedule') body=`<div class="scroll"><table class="tbl"><thead><tr><th>№</th><th>Дата платежа</th><th class="r">Лизинговый платёж</th><th class="r">Начисление (услуга с НДС)</th><th>Статус</th></tr></thead><tbody>
     <tr><td>—</td><td>${c.signed}</td><td class="r num">${rub(c.advance)}<span class="sub">Аванс</span></td><td class="r num">—</td><td><span class="pill ok">Оплачен</span></td></tr>
     ${Array.from({length:c.months},(_,i)=>{ const n=i+1; const d=payDate(c,n); const st=n<=c.paid?'ok':n===c.paid+1?(c.saldo<0?'bad':'warn'):'off'; return `<tr><td class="num">${n}</td><td class="num">${d.toLocaleDateString('ru-RU')}</td><td class="r num">${rub(c.monthly)}</td><td class="r num">${rub(Math.round(c.monthly*1.012))}</td><td><span class="pill ${st}">${st==='ok'?'Оплачен':st==='bad'?'Просрочен':st==='warn'?'К оплате':'План'}</span></td></tr>`;}).slice(0,c.paid+4).join('')}
@@ -603,7 +611,7 @@ V.contract = (id, tab='subject') => { const c=byId(id); if(!c) return V.contract
   <div class="actions"><button class="btn primary" onclick="invoiceSheet('${c.id}')">${I.qr} Счёт на оплату</button><a class="btn" href="#/accounting/acts">Акт сверки</a><a class="btn" href="#/requests/new">Запросить справку</a></div></div>
 <div class="card"><div class="bd" style="display:grid;gap:20px">
   <div class="dl"><div><dt>Дата заключения</dt><dd class="num">${c.signed}</dd></div><div><dt>Передача предмета</dt><dd class="num">${c.handed}</dd></div><div><dt>Завершение</dt><dd class="num">${c.ends}</dd></div><div><dt>Срок</dt><dd class="num">${c.months} мес.</dd></div><div><dt>Сумма договора</dt><dd class="num">${rub(c.total)}</dd></div><div><dt>Аванс</dt><dd class="num">${rub(c.advance)}</dd></div><div><dt>Ежемесячный платёж</dt><dd class="num">${rub(c.monthly)}</dd></div><div><dt>Выкупной платёж</dt><dd class="num">${rub(c.buyout)}</dd></div></div>
-  <div style="display:grid;gap:8px"><div style="display:flex;justify-content:space-between;font-size:13px"><span>Оплачено <b class="num">${rub(paidSum)}</b> из ${rub(c.total)}</span><span class="muted num">${c.paid} из ${c.months} платежей · ${Math.round(paidSum/c.total*100)}%</span></div>${stripes(c.paid,c.months,'wide'+(c.paid===c.months?' ok':''),c.months)}
+  <div style="display:grid;gap:8px"><div class="paidrow"><span>Оплачено <b class="num">${rub(paidSum)}</b> из ${rub(c.total)}</span><span class="muted num">${c.paid} из ${c.months} платежей · ${Math.round(paidSum/c.total*100)}%</span></div>${stripes(c.paid,c.months,'wide'+(c.paid===c.months?' ok':''),c.months)}
   <div class="small">Следующий платёж <b class="num">${rub(np.sum)}</b> до ${dstr(np.d)}${np.note?' ('+np.note+')':''}. ${c.saldo<0?`<span style="color:var(--bad)">Просрочено ${rub(-c.saldo)}.</span>`:c.saldo>0?`Переплата ${rub(c.saldo)} зачтётся в следующий платёж.`:''}</div></div>
 </div></div>
 <div class="card"><div class="tabs" role="tablist">${Object.entries(tabs).map(([k,v])=>`<button role="tab" aria-selected="${k===tab}" onclick="render('contract','${c.id}','${k}')">${v}</button>`).join('')}</div>${body}</div>`;
@@ -664,7 +672,7 @@ function invMode(m){ invM=m; document.getElementById('pm').setAttribute('aria-se
   invFilter(); }
 function invFilter(){ const per=+document.getElementById('per').value, ctr=document.getElementById('ctr').value, yr=+document.getElementById('yr').value;
   const rows=INVOICES.filter(i=>yr===2026&&(invM==='m'?i.m===per:i.q===per)&&(ctr==='all'||i.c===ctr));
-  document.getElementById('invb').innerHTML=rows.map((i,k)=>`<tr><td><input type="checkbox" class="ick" style="width:auto" onchange="invCnt()"></td><td><b>${i.n}</b><span class="sub">от 30.${String(i.m).padStart(2,'0')}.2026</span></td><td>${i.per}</td><td>${i.c}</td><td class="r num">${rub(i.sum)}</td><td class="r num">${rub(Math.round(i.sum/6))}</td><td class="r"><button class="btn sm" onclick="toast('Файл сохранён: ${i.n}.pdf')">${I.dl} PDF</button></td></tr>`).join('')||`<tr><td colspan="7" class="empty">За этот период документов нет</td></tr>`;
+  document.getElementById('invb').innerHTML=rows.map((i,k)=>`<tr><td><input type="checkbox" class="ick" style="width:auto" onchange="invCnt()"></td><td><b>${i.n}</b><span class="sub">от 30.${String(i.m).padStart(2,'0')}.2026</span></td><td>${i.per}</td><td class="nowrap">${i.c}</td><td class="r num">${rub(i.sum)}</td><td class="r num">${rub(Math.round(i.sum/6))}</td><td class="r"><button class="btn sm" onclick="toast('Файл сохранён: ${i.n}.pdf')">${I.dl} PDF</button></td></tr>`).join('')||`<tr><td colspan="7" class="empty">За этот период документов нет</td></tr>`;
   document.getElementById('invc').innerHTML=rows.map(i=>`<li><label class="sel"><input type="checkbox" class="ick" onchange="invCnt()"><span style="display:grid;gap:8px"><span class="row1"><b>${i.n}</b><b class="num">${rub(i.sum)}</b></span>
     <span class="kv"><span><i>Период</i>${i.per}</span><span><i>Договор</i>${i.c}</span><span><i>Дата</i><span class="num">30.${String(i.m).padStart(2,'0')}.2026</span></span><span><i>НДС 20%</i><span class="num">${rub(Math.round(i.sum/6))}</span></span></span>
     <span><button type="button" class="btn sm" onclick="toast('Файл сохранён: ${i.n}.pdf')">${I.dl} Скачать PDF</button></span></span></label></li>`).join('')||`<li class="empty">За этот период документов нет</li>`;
@@ -681,15 +689,15 @@ V.requests = (filter='all') => {
   const list = REQUESTS.filter(r=>filter==='all'||(filter==='work'?r.st!=='done':r.st==='done'));
   const steps = r => `<ol class="hsteps" aria-label="Этапы">${r.steps.map((s,i)=>`<li class="${r.st==='done'||i<r.steps.length-1?'done':'cur'}">${s}</li>`).join('')}${r.st!=='done'?'<li class="next">Готово</li>':''}</ol>`;
   const status = r => r.st==='done'?'<span class="pill ok">Готово</span>':'<span class="pill">В работе</span>';
-  const action = r => r.st==='done'?`<button class="btn sm" onclick="toast('Файл сохранён')">${I.dl} Скачать</button>`:`<span class="sub">до 2 рабочих дней</span>`;
+  const action = r => r.st==='done'?`<a href="#/requests" class="sub" style="color:var(--blue)" onclick="toast('Файл сохранён');return false">Скачать PDF</a>`:`<span class="sub">до 2 рабочих дней</span>`;
   return `
 <div class="page-head"><div><h1>Запросы</h1><p class="muted">Справки, акты и оригиналы. Типовые запросы 1С выполняет сама, остальные берёт менеджер.</p></div>
   <div class="actions"><a class="btn primary" href="#/requests/new">Новый запрос</a></div></div>
 <div class="chips">${[['all','Все'],['work','В работе'],['done','Выполненные']].map(([k,v])=>`<button class="chip" aria-pressed="${k===filter}" onclick="render('requests','${k}')">${v}</button>`).join('')}</div>
-<div class="card"><ul class="clist">${list.map(r=>`<li><div class="row1"><b>${esc(r.kind)}</b>${status(r)}</div><span class="sub">${r.id} · ${esc(r.c)} · создан ${r.created}</span>${steps(r)}<div>${action(r)}</div></li>`).join('')||'<li class="empty">Запросов нет</li>'}</ul>
-<div class="scroll"><table class="tbl fixed"><colgroup><col style="width:27%"><col style="width:13%"><col style="width:11%"><col style="width:36%"><col style="width:13%"></colgroup>
+<div class="card"><ul class="clist">${list.map(r=>`<li><div class="row1"><b>${esc(r.kind)}</b>${status(r)}</div><span class="sub">${r.id} · ${esc(r.c)} · создан ${r.created}</span>${steps(r)}<div>${r.st==='done'?`<button class="btn sm" onclick="toast('Файл сохранён')">${I.dl} Скачать PDF</button>`:action(r)}</div></li>`).join('')||'<li class="empty">Запросов нет</li>'}</ul>
+<div class="scroll"><table class="tbl fixed rows-eq" style="min-width:960px"><colgroup><col style="width:24%"><col style="width:13%"><col style="width:14%"><col style="width:36%"><col style="width:13%"></colgroup>
   <thead><tr><th>Запрос</th><th>Договор</th><th>Создан</th><th>Этап</th><th class="r"></th></tr></thead>
-  <tbody>${list.map(r=>`<tr><td><b>${esc(r.kind)}</b><span class="sub">${r.id}</span></td><td>${esc(r.c)}</td><td class="num">${r.created}</td><td>${steps(r)}</td><td class="r">${status(r)}<div style="margin-top:6px">${action(r)}</div></td></tr>`).join('')||'<tr><td colspan="5" class="empty">Запросов нет</td></tr>'}</tbody>
+  <tbody>${list.map(r=>`<tr><td><b>${esc(r.kind)}</b><span class="sub">${r.id}</span></td><td>${esc(r.c)}</td><td class="num">${r.created}</td><td>${steps(r)}</td><td class="r">${status(r)}<div style="margin-top:4px">${action(r)}</div></td></tr>`).join('')||'<tr><td colspan="5" class="empty">Запросов нет</td></tr>'}</tbody>
 </table></div></div>`;
 };
 
@@ -718,10 +726,10 @@ V.insurance = () => `
 
 V.settings = (tab='staff') => {
   const tabs={account:'Учётная запись',staff:'Сотрудники',edo:'ЭДО и уведомления'}; let body='';
-  if(tab==='account') body=`<div class="bd" style="max-width:520px;display:grid;gap:14px"><div class="dl"><div><dt>Логин</dt><dd>m.safin@trans-volga.ru</dd></div><div><dt>Телефон</dt><dd class="num">+7 917 000-00-00</dd></div><div><dt>Компания</dt><dd>${esc(COMPANY.name)}</dd></div><div><dt>ИНН</dt><dd class="num">${COMPANY.inn}</dd></div></div>
+  if(tab==='account') body=`<div class="bd" style="max-width:520px;display:grid;gap:14px"><div class="dl"><div class="w2"><dt>Логин</dt><dd>m.safin@trans-volga.ru</dd></div><div><dt>Телефон</dt><dd class="num">+7 917 000-00-00</dd></div><div><dt>Компания</dt><dd>${esc(COMPANY.name)}</dd></div><div><dt>ИНН</dt><dd class="num">${COMPANY.inn}</dd></div></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" onclick="toast('Ссылка для смены пароля отправлена на почту')">Сменить пароль</button><button class="btn" onclick="toast('Код подтверждения отправлен')">Изменить телефон</button></div></div>`;
   if(tab==='staff') body=`<div class="toolbar"><span class="small muted">Доступ сотрудникам выдаёт только владелец учётной записи. Самостоятельная регистрация на ту же компанию невозможна.</span><button class="btn sm primary" style="margin-left:auto" onclick="toast('Приглашение отправлено')">Пригласить сотрудника</button></div>
-    <div class="scroll"><table class="tbl"><thead><tr><th>Сотрудник</th><th>Роль</th><th>Что может</th><th></th></tr></thead><tbody>${STAFF.map(s=>`<tr><td><b>${s.name}</b><span class="sub">${s.mail}</span></td><td><span class="pill ${s.role==='Владелец'?'':'off'}">${s.role}</span></td><td class="muted">${s.note}</td><td class="r">${s.role==='Владелец'?'':`<button class="btn sm ghost" onclick="toast('Роль изменена')">Изменить</button>`}</td></tr>`).join('')}</tbody></table></div>`;
+    <div class="scroll"><table class="tbl"><thead><tr><th>Сотрудник</th><th>Роль</th><th>Что может</th><th></th></tr></thead><tbody>${STAFF.map(s=>`<tr><td><b>${s.name}</b><span class="sub nowrap">${s.mail}</span></td><td><span class="pill ${s.role==='Владелец'?'':'off'}">${s.role}</span></td><td class="muted">${s.note}</td><td class="r">${s.role==='Владелец'?'':`<button class="btn sm ghost" onclick="toast('Роль изменена')">Изменить</button>`}</td></tr>`).join('')}</tbody></table></div>`;
   if(tab==='edo') body=`<div class="bd" style="display:grid;gap:18px;max-width:560px"><div style="display:flex;gap:12px;align-items:center"><span class="pill ok">Подключён</span><div><b>Диадок</b><div class="small muted">ID участника 2BE-04A1…F3. Оригиналы УПД и актов приходят сюда.</div></div></div>
     <div style="display:grid;gap:10px"><h3>Уведомления на почту</h3>${['За 5 дней до платежа','Новые закрывающие документы','Полис истекает через 30 дней','Статус запросов'].map((t,i)=>`<label style="display:flex;gap:10px;align-items:center"><input type="checkbox" style="width:auto" ${i<3?'checked':''}>${t}</label>`).join('')}</div></div>`;
   return `<div class="page-head"><div><h1>Настройки</h1></div></div><div class="card"><div class="tabs" role="tablist">${Object.entries(tabs).map(([k,v])=>`<button role="tab" aria-selected="${k===tab}" onclick="location.hash='#/settings/${k}'">${v}</button>`).join('')}</div>${body}</div>`;
