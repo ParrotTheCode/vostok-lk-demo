@@ -10,14 +10,11 @@ python -m http.server 5173 --directory demo
 
 ## Бесплатное размещение
 
-**GitHub Pages** (как у конкурента, ссылка вида `user.github.io/repo`):
-1. Создать публичный репозиторий на github.com, например `vostok-lk-demo`.
-2. Положить `index.html` в корень и запушить:
+**GitHub Pages**: репозиторий https://github.com/ParrotTheCode/vostok-lk-demo, сайт https://parrotthecode.github.io/vostok-lk-demo/ (ветка `gh-pages`, корень). Обновить после правок:
 ```bash
-cd demo && git init && git add index.html && git commit -m "demo" && git branch -M main
-git remote add origin https://github.com/<ЛОГИН>/vostok-lk-demo.git && git push -u origin main
+git add -A && git commit -m "update" && git push origin main && git push origin main:gh-pages
 ```
-3. Settings → Pages → Source: Deploy from a branch → `main` / `/ (root)` → Save. Через минуту ссылка появится там же.
+Если сайт не открывается: Settings → Pages → Source: Deploy from a branch → `gh-pages` / `/ (root)`.
 
 **Netlify Drop** (без git): app.netlify.com/drop → перетащить папку `demo`. Ссылка сразу, можно задать своё имя `*.netlify.app`.
 
