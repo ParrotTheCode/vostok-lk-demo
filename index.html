@@ -50,9 +50,10 @@ button{font:inherit;color:inherit}
 .login-art p{position:relative;max-width:40ch;opacity:.8;margin-top:14px}
 .login-form{display:flex;align-items:center;justify-content:center;padding:48px 24px;background:var(--surface)}
 .login-form form{width:100%;max-width:380px;display:grid;gap:16px}
-.seg{display:grid;grid-template-columns:1fr 1fr;background:var(--sky2);border-radius:10px;padding:4px}
-.seg button{border:0;background:transparent;padding:10px;border-radius:7px;cursor:pointer;color:var(--muted);font-weight:500}
-.seg button[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
+.seg{display:flex;background:var(--sky2);border-radius:10px;padding:4px}
+.seg>*{flex:1 1 auto;border:0;background:transparent;padding:9px 14px;min-height:0;border-radius:7px;cursor:pointer;color:var(--muted);font-weight:500;font-size:14px;white-space:nowrap;text-align:center;text-decoration:none;line-height:1.4}
+.seg>*:hover{color:var(--ink)}
+.seg>[aria-selected="true"]{background:var(--surface);color:var(--ink);box-shadow:var(--shadow)}
 label.f{display:grid;gap:6px;font-size:13px;font-weight:500}
 input,select,textarea{font:inherit;color:inherit;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;width:100%;min-width:0}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px color-mix(in srgb,var(--blue) 25%,transparent)}
@@ -303,6 +304,8 @@ body:has(.app) .demo-tag{display:none}
   .cal-grid .day .pay.paid{background:var(--ok)}
   .qr{grid-template-columns:1fr}
   input,select,textarea{font-size:16px}
+  .demo-tag{position:static;display:block;width:max-content;margin:0 auto 16px;background:transparent;border:0}
+  .login-form{padding-bottom:24px}
   .btn{min-height:44px}
   .nav a{padding:11px 10px}
 }
@@ -439,7 +442,7 @@ V.login = () => `
   </section>
   <section class="login-form">
     <form id="lf">
-      <div class="seg" role="tablist"><button type="button" role="tab" aria-selected="true">Вход</button><a class="btn ghost" href="#/register" role="tab" aria-selected="false" style="border:0;background:transparent;color:var(--muted)">Регистрация компании</a></div>
+      <div class="seg" role="tablist"><button type="button" role="tab" aria-selected="true">Вход</button><a href="#/register" role="tab" aria-selected="false">Регистрация компании</a></div>
       <label class="f">Электронная почта<input id="em" type="email" value="m.safin@trans-volga.ru" autocomplete="username"></label>
       <label class="f">Пароль<input id="pw" type="password" value="demo-demo" autocomplete="current-password"></label>
       <button class="btn primary" type="submit" style="padding:12px">Войти в кабинет</button>
@@ -488,7 +491,7 @@ V.register = () => {
   </section>
   <section class="login-form">
     <form id="rf" style="gap:18px">
-      ${s<5?`<div class="seg" role="tablist"><a class="btn ghost" href="#/" role="tab" aria-selected="false" style="border:0;background:transparent;color:var(--muted)">Вход</a><button type="button" role="tab" aria-selected="true">Регистрация компании</button></div>
+      ${s<5?`<div class="seg" role="tablist"><a href="#/" role="tab" aria-selected="false">Вход</a><button type="button" role="tab" aria-selected="true">Регистрация компании</button></div>
       <div class="prog" aria-label="Шаг ${s} из 4">${[1,2,3,4].map(i=>`<i class="${i<=s?'on':''}"></i>`).join('')}</div>
       <h2>${titles[s]}</h2>`:''}
       ${steps[s]}
@@ -607,7 +610,7 @@ V.accounting = (tab='calendar') => {
         ${isNow?`<button class="btn primary" onclick="invoiceSheet('all')">${I.qr} Счёт по всем договорам</button>`:''}</div></div></div></div>`;
   }
   if(tab==='invoices'){
-    body=`<div class="toolbar"><div class="seg" style="display:inline-grid"><button id="pm" aria-selected="true" onclick="invMode('m')">Месяц</button><button id="pq" aria-selected="false" onclick="invMode('q')">Квартал</button></div>
+    body=`<div class="toolbar"><div class="seg" style="display:inline-flex"><button id="pm" aria-selected="true" onclick="invMode('m')">Месяц</button><button id="pq" aria-selected="false" onclick="invMode('q')">Квартал</button></div>
       <select id="per" onchange="invFilter()"></select>
       <select id="yr" onchange="invFilter()"><option>2026</option><option>2025</option></select><select id="ctr" onchange="invFilter()"><option value="all">Все договоры</option>${CONTRACTS.map(c=>`<option>${c.id}</option>`).join('')}</select>
       <span class="small muted" style="margin-left:auto"><span class="pill ok">ЭДО подключён</span> Диадок</span></div>
@@ -723,8 +726,8 @@ function shell(view, inner, base){
 }
 function render(view, ...args){
   const app=document.getElementById('app');
-  if(view==='login'){ app.innerHTML=V.login(); document.getElementById('lf').onsubmit=e=>{e.preventDefault(); location.hash='#/home';}; return; }
-  if(view==='register'){ app.innerHTML=V.register(); regInit(); window.scrollTo(0,0); return; }
+  if(view==='login'){ app.innerHTML=V.login(); document.title='Вход · Восток-Лизинг'; document.getElementById('lf').onsubmit=e=>{e.preventDefault(); location.hash='#/home';}; return; }
+  if(view==='register'){ app.innerHTML=V.register(); document.title='Регистрация · Восток-Лизинг'; regInit(); window.scrollTo(0,0); return; }
   const base = view==='contract'?'contracts':view==='requestNew'?'requests':view;
   app.innerHTML=shell(view, V[view](...args), base);
   const rail=document.getElementById('rail'); rail.classList.remove('open');
