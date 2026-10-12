@@ -33,6 +33,19 @@ button{font:inherit;color:inherit}
 .muted{color:var(--muted)}
 .small{font-size:13px}
 :focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:6px}
+/* motion: only in answer to an action or to mark a state change; 120–250 ms, no layout shifts */
+@keyframes fade{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{opacity:0;transform:scale(.98)}to{opacity:1;transform:none}}
+@keyframes rise{from{opacity:0;transform:translate(-50%,8px)}to{opacity:1;transform:translate(-50%,0)}}
+@keyframes fill{from{background:var(--line)}}
+.content{animation:fade .18s ease-out}
+.sheet{animation:fade .15s ease-out}
+.sheet .box{animation:pop .18s ease-out}
+.toast{animation:rise .2s ease-out}
+.stripes.wide i.on{animation:fill .3s both;animation-delay:calc(var(--i,0)*12ms)}
+.nav a,.attn a,.tbl tr.row td,.chip,.clist a,.cal-grid .day,.hsteps li::before{transition:background-color .12s,color .12s,border-color .12s}
+.tbl tr.row:active td{background:var(--sky)}
+.btn:active{transform:translateY(.5px)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
 /* ---------- logo ---------- */
@@ -45,8 +58,17 @@ button{font:inherit;color:inherit}
 #app{min-height:100%}
 .login{min-height:100vh;min-height:100dvh;display:grid;grid-template-columns:1.1fr 1fr}
 .login-art{position:relative;background:var(--brand-grad);color:#fff;padding:48px;display:flex;flex-direction:column;justify-content:space-between;overflow:hidden}
+/* fixed anchors so the headline and the form do not shift between login, registration and its steps */
+@media (min-width:981px){
+  .login-art{display:block}
+  .login-art>.logo{position:absolute;left:48px;top:48px}
+  .login-art>div{position:absolute;left:48px;right:48px;top:44%}
+  .login-art>p.small{position:absolute;left:48px;bottom:48px}
+  .login .login-form{align-items:flex-start;padding-top:clamp(96px,28vh,280px)}
+}
 .login-art .sphere{position:absolute;right:4%;top:50%;transform:translateY(-50%);width:min(42%,480px);aspect-ratio:1;color:#9CC4EA;opacity:.55;pointer-events:none}
 .login-art h1{font-size:34px;line-height:1.15;position:relative;font-weight:600;text-wrap:initial}
+@media (max-width:760px){br.d{display:none}.login-art h1{font-size:28px;text-wrap:balance}}
 .login-art p{position:relative;max-width:40ch;opacity:.8;margin-top:14px}
 .login-form{display:flex;align-items:center;justify-content:center;padding:48px 24px;background:var(--surface)}
 .login-form form{width:100%;max-width:380px;display:grid;gap:16px}
@@ -304,6 +326,7 @@ body:has(.app) .demo-tag{display:none}
   .login-form{padding-bottom:24px}
   .btn{min-height:44px}
   .nav a{padding:11px 10px}
+  .hsteps li{font-size:11px;padding-right:4px}
 }
 </style>
 </head>
@@ -382,7 +405,7 @@ const contractCards = list => `<ul class="clist">${list.map(c=>{ const np=PAYMEN
   ${stripes(c.paid,c.months,c.paid===c.months?'ok':'')}
   <div class="row2"><span class="muted num">${c.paid} из ${c.months} платежей</span><span class="num">Следующий <b>${rub(np.sum)}</b> · ${dstr(np.d)}</span></div>
   ${c.saldo<0?`<span class="pill bad num">Долг ${rub(-c.saldo)}</span>`:c.saldo>0?`<span class="pill ok num">Переплата ${rub(c.saldo)}</span>`:''}</a></li>`;}).join('')}</ul>`;
-const stripes = (paid, total, cls='', n=24) => `<div class="stripes ${cls}" aria-label="Оплачено ${paid} из ${total}">${Array.from({length:n},(_,i)=>`<i class="${i < Math.round(paid/total*n) ? 'on':''}"></i>`).join('')}</div>`;
+const stripes = (paid, total, cls='', n=24) => `<div class="stripes ${cls}" aria-label="Оплачено ${paid} из ${total}">${Array.from({length:n},(_,i)=>`<i class="${i < Math.round(paid/total*n) ? 'on':''}" style="--i:${i}"></i>`).join('')}</div>`;
 /* globe: latitude bands, thicker at the equator, packed toward the poles — the logo's "lines of varying weight" */
 const sphere = (cls='') => { const R=48, bands=[]; for(let i=1;i<=11;i++){ const th=Math.PI*i/12; const y=50-R*Math.cos(th); const h=1.2+6.5*Math.sin(th)**2; bands.push(`<rect x="0" y="${(y-h/2).toFixed(2)}" width="100" height="${h.toFixed(2)}"/>`);}
   return `<svg class="${cls}" viewBox="0 0 100 100" aria-hidden="true"><defs><clipPath id="c${cls||'x'}"><circle cx="50" cy="50" r="${R}"/></clipPath></defs><g clip-path="url(#c${cls||'x'})" fill="currentColor">${bands.join('')}</g></svg>`; };
@@ -432,7 +455,7 @@ V.login = () => `
   <section class="login-art">
     ${sphere('sphere')}
     <a class="logo" href="#/" style="color:#fff">${sphere()}<b style="color:#fff">Восток-Лизинг</b></a>
-    <div><h1>Договоры, платежи<br>и закрывающие документы<br>в одном месте</h1>
+    <div><h1>Договоры, платежи<br class="d">и закрывающие документы<br class="d">в одном месте</h1>
       <p>Кабинет лизингополучателя. Счёт с QR за секунду, акт сверки из 1С без звонка менеджеру, УПД пакетом за квартал.</p></div>
     <p class="small" style="opacity:.6;position:relative">Казань · с 2004 года</p>
   </section>
